@@ -1,0 +1,12 @@
+[project]
+name = "minirag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "faiss-cpu>=1.12.0",
+    "langchain>=1.0.5",
+    "langchain-text-splitters>=1.0.0",
+    "ollama>=0.6.0",
+]
