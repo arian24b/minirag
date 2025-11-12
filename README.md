@@ -1,0 +1,1 @@
+send full config for Port Forwarding in server 1 and 2 with WaterWall i want forward ports (2053, 2083, 2096, 2087) from server 1 on port 443 to server 2. i installd waterwall on both server. send me "core.json" and "config.json". if can, i want for both tcp and udp.

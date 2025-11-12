@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import faiss
 import numpy as np
@@ -10,19 +11,20 @@ DOCS_PATH = "./docs"
 INDEX_FILE = "./index.faiss"
 META_FILE = "./meta.json"
 EMBED_MODEL = "embeddinggemma:latest"
-LLM_MODEL = "deepseek-r1:latest"
+LLM_MODEL = "qwen2.5-coder:latest"
 
 
-def load_docs(path):
+def load_docs(path: Path) -> list[str]:
     docs = []
-    for file in os.listdir(path):
-        if file.endswith(".md") or file.endswith(".mdx"):
-            with open(os.path.join(path, file), encoding="utf-8") as f:
-                docs.append(f.read())
+    for root, _, files in os.walk(path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if file.endswith((".md", ".mdx")):
+                docs.append(Path(file_path).read_text(encoding="utf-8"))
     return docs
 
 
-def chunk_docs(docs):
+def chunk_docs(docs: list[str]):
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=150)
     return [chunk for doc in docs for chunk in splitter.split_text(doc)]
 
@@ -90,9 +92,9 @@ if __name__ == "__main__":
 
     index, chunks, dim = load_index()
 
-    print("\nMini RAG Chat is ready. Type 'exit' to quit.\n")
+    print("\nMini RAG Chat is ready.\n")
     while True:
-        query = input("Ask: ").strip()
+        query = input("Ask, Type 'exit' to quit: ").strip()
         if query.lower() in {"exit", "quit"}:
             break
         context = "\n\n".join(retrieve(query, index, chunks, expected_dim=dim))
