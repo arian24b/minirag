@@ -7,6 +7,8 @@ import numpy as np
 import ollama
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+client = ollama.Client(host="http://rpi.local:11434", follow_redirects=True)
+
 DOCS_PATH = "./docs"
 INDEX_FILE = "./index.faiss"
 META_FILE = "./meta.json"
@@ -33,7 +35,7 @@ def build_index(chunks):
     print("Generating embeddings and building FAISS index...")
     vectors = []
     for text in chunks:
-        emb = ollama.embeddings(model=EMBED_MODEL, prompt=text)["embedding"]
+        emb = client.embeddings(model=EMBED_MODEL, prompt=text)["embedding"]
         vectors.append(emb)
 
     vectors = np.array(vectors).astype("float32")
@@ -55,7 +57,7 @@ def load_index():
 
 
 def retrieve(query, index, chunks, top_k=3, expected_dim=None):
-    q_emb = ollama.embeddings(model=EMBED_MODEL, prompt=query)["embedding"]
+    q_emb = client.embeddings(model=EMBED_MODEL, prompt=query)["embedding"]
     q_emb = np.array([q_emb]).astype("float32")
 
     if expected_dim and q_emb.shape[1] != expected_dim:
@@ -77,7 +79,7 @@ Context:
 
 Question: {query}
 Answer:"""
-    response = ollama.chat(
+    response = client.chat(
         model=LLM_MODEL,
         messages=[{"role": "user", "content": prompt}],
     )
